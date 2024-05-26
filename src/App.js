@@ -1,72 +1,113 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 function App() {
   const can = useRef();
+  const [bonus, setBonus] = useState(0);
 
   useEffect(() => {
     const canvas = can.current;
     const context = canvas.getContext("2d");
-    context.fillStyle = "blue";
-    context.fillRect(0, 0, 9, 9);
-    let scaleX = 0;
-    let scaleY = 0;
-    let str = 'goRight';
+    context.fillStyle = "black";
+    context.fillRect(0, 0, 10, 10);
+
+    let Xposition = [0];
+    let Yposition = [0];
+    let str = "goRight";
+    let randomPoint = randomFood();
     setInterval(() => {
-      context.clearRect(0, 0, 200, 400);
-      // scaleX = scaleX + 9;
-      if (scaleX > 200) {
-        scaleX = 0;
+      if (
+        randomPoint[0] * 10 === Xposition[0] &&
+        randomPoint[1] * 10 === Yposition[0]
+      ) {
+        randomPoint = randomFood();
+        setBonus((prev) => prev + 1);
+        switch (str) {
+          case "goRight": {
+            Xposition = [
+              Xposition[0] + 10,
+              Xposition[0],
+              ...Xposition.slice(1)
+            ];
+            Yposition = [Yposition[0], ...Yposition];
+            break;
+          }
+          case "goLeft": {
+            Xposition = [
+              Xposition[0] - 10,
+              Xposition[0],
+              ...Xposition.slice(1)
+            ];
+            Yposition = [Yposition[0], ...Yposition];
+            break;
+          }
+          case "goUp": {
+            Xposition = [Xposition[0], ...Xposition];
+            Yposition = [
+              Yposition[0] - 10,
+              Yposition[0],
+              ...Yposition.slice(1)
+            ];
+            break;
+          }
+          case "goDown": {
+            Xposition = [Xposition[0], ...Xposition];
+            Yposition = [
+              Yposition[0] + 10,
+              Yposition[0],
+              ...Yposition.slice(1)
+            ];
+            break;
+          }
+          default:
+            break;
+        }
       }
-      if (scaleY > 400) {
-        scaleY = 0;
+      context.clearRect(0, 0, 400, 400);
+      context.fillStyle = "red";
+      context.fillRect(randomPoint[0] * 10, randomPoint[1] * 10, 10, 10);
+      context.fillStyle = "black";
+      // Xposition = Xposition + 10;
+      console.log("ypostion", Yposition);
+      console.log("xpostion", Xposition);
+      Xposition = Xposition.map((item) => {
+        if (item > 400) {
+          return 0;
+        } else if (item < 0) {
+          return 400;
+        } else {
+          return item;
+        }
+      });
+
+      Yposition = Yposition.map((item) => {
+        if (item > 400) {
+          return 0;
+        } else if (item < 0) {
+          return 400;
+        } else {
+          return item;
+        }
+      });
+      move(Xposition,Yposition,str)
+     
+      for (let i = 0; i < Xposition.length; i++) {
+        context.fillRect(0 + Xposition[i], 0 + Yposition[i], 10, 10);
       }
-      if (scaleX < 0) {
-        scaleX = 200;
-      }
-      if (scaleY < 0) {
-        scaleY = 400;
-      }
-      switch(str)
-      {
-        case 'goRight':{
-          scaleX = scaleX + 9
-          break;
-        }
-        case 'goLeft':{
-          scaleX =scaleX - 9
-          break;
-        }
-        case 'goUp':{
-          scaleY = scaleY - 9
-          break;
-        }
-        case 'goDown':{
-          scaleY = scaleY + 9
-          break;
-        }
-        default:
-          break;
-        }
-      context.fillRect(0 + scaleX, 0+scaleY, 9, 9);
       document.onkeydown = function (e) {
         switch (e.keyCode) {
           case 37: {
-            str = 'goLeft' 
-            console.log('left')
+            str = "goLeft";
             break;
           }
           case 38:
-            str = 'goUp'
-            console.log('up')
+            str = "goUp";
             break;
           case 39:
-            str = 'goRight'
-            console.log('right')
+            str = "goRight";
             break;
           case 40:
-            str = 'goDown'
-            console.log('down')
+            str = "goDown";
             break;
           default:
             break;
@@ -75,10 +116,62 @@ function App() {
     }, 362);
   }, []);
 
-  console.log(can);
+  const randomFood = () => {
+    let x = Math.floor(Math.random() * 40);
+    let y = Math.floor(Math.random() * 40);
+    return [x, y];
+  };
+
+  const move = (Xposition, Yposition, direction) => {
+    let tempx =[]
+    let tempy =[]
+    for (let i=0; i<Xposition.length; i=i+1){
+       tempx[i] = Xposition[i]
+       tempy[i] = Yposition[i]
+    }
+    switch (direction) {
+      case "goRight": {
+        Xposition[0] = Xposition[0] + 10
+        for (let i=1; i<Xposition.length ; i=i+1){
+          Xposition[i]=tempx[i-1]
+          Yposition[i] = tempy[i-1]
+        }
+        break;
+      }
+      case "goLeft": {
+        Xposition[0] = Xposition[0] - 10
+        for (let i=1; i<Xposition.length ; i=i+1){
+          Xposition[i]=tempx[i-1]
+          Yposition[i] = tempy[i-1]
+        }
+        break;
+      }
+      case "goUp": {
+        Yposition[0] = Yposition[0] - 10
+        for (let i=1; i<Xposition.length ; i=i+1){
+          Xposition[i]=tempx[i-1]
+          Yposition[i] = tempy[i-1]
+        }
+        break;
+      }
+      case "goDown": {
+        Yposition[0] = Yposition[0] + 10
+        for (let i=1; i<Xposition.length ; i=i+1){
+          Xposition[i]=tempx[i-1]
+          Yposition[i] = tempy[i-1]
+        }
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  };
+
   return (
-    <div>
-      <canvas ref={can} width="200px" height="400px" id="canvas" />
+    <div className="container">
+      <canvas ref={can} width="400px" height="400px" id="canvas" />
+      {bonus}
     </div>
   );
 }
