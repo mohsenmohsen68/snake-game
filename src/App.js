@@ -6,19 +6,21 @@ function App() {
   const can = useRef();
   const [bonus, setBonus] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-  const [stop,setStop] = useState(false)
 
 const startTheGame = ()=>{
+  setBonus(0)
+  setGameOver(false)
   const canvas = can.current;
   const context = canvas.getContext("2d");
   context.fillStyle = "black";
   context.fillRect(0, 0, 10, 10);
-
   let Xposition = [0];
   let Yposition = [0];
   let str = "goRight";
   let randomPoint = randomFood();
-  const snakeInterval = setInterval(() => {
+
+  window.snakeInterval = setInterval(() => {
+    //if snake eats the bait ...
     if (
       randomPoint[0] * 10 === Xposition[0] &&
       randomPoint[1] * 10 === Yposition[0]
@@ -70,6 +72,8 @@ const startTheGame = ()=>{
     context.fillStyle = "red";
     context.fillRect(randomPoint[0] * 10, randomPoint[1] * 10, 10, 10);
     context.fillStyle = "black";
+
+    //check if the goes out of the canvas ...
     Xposition = Xposition.map((item) => {
       if (item > 400) {
         return 0;
@@ -90,10 +94,11 @@ const startTheGame = ()=>{
       }
     });
     move(Xposition, Yposition, str);
-
+//draw the snake ...
     for (let i = 0; i < Xposition.length; i++) {
       context.fillRect(0 + Xposition[i], 0 + Yposition[i], 10, 10);
     }
+//program logic when the user hits arrow keys ...
     document.onkeydown = function (e) {
       switch (e.keyCode) {
         case 37: {
@@ -113,9 +118,10 @@ const startTheGame = ()=>{
           break;
       }
     };
+// game over logic ... snake hitting itself ...
     if (conflict(Xposition, Yposition)) {
       setGameOver(true);
-      clearInterval(snakeInterval)
+      clearInterval(window.snakeInterval)
     }
     
   }, 362);
@@ -123,9 +129,8 @@ const startTheGame = ()=>{
 }
 
 const stopTheGame = ()=>{
-  setStop(true)
-  
- // clearInterval(snakeInterval)
+ clearInterval(window.snakeInterval)
+ setGameOver(true)
 }
   const randomFood = () => {
     let x = Math.floor(Math.random() * 40);
