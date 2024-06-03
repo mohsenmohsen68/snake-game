@@ -209,7 +209,7 @@ const stopTheGame = ()=>{
       <h1>
       {bonus}
       </h1> 
-      <h1>
+      <h1 className={`${gameOver?'fail':'success'}`}>
       {gameOver ? 'gameover': 'isPlaying'}
       </h1>
     </div>

@@ -17,3 +17,9 @@
     justify-content: center;
     gap:20px;
 }
+.fail{
+    color: red;
+}
+.success{
+    color:green;
+}
